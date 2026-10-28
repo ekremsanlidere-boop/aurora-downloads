@@ -1,0 +1,29 @@
+name: ChatGPT APK Export
+on:
+  push:
+    paths:
+      - '.github/workflows/chatgpt-apk-export.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download current Nocta APK
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 2 \
+            -o Nocta-alpha.apk \
+            "https://github.com/ekremsanlidere-boop/aurora-downloads/releases/download/alpha-feedback-13/Nocta-alpha.apk"
+          echo "5f70de8649e239c13781dd9030e70c1e1bd79f31e0cb3d2d07f4dc64d2681a7e  Nocta-alpha.apk" | sha256sum -c -
+          test "$(stat -c%s Nocta-alpha.apk)" = "90921754"
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nocta-alpha-feedback-13
+          path: Nocta-alpha.apk
+          compression-level: 0
+          retention-days: 1
